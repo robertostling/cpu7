@@ -50,25 +50,25 @@ host system, execute:
 
     python3 utils/upload_text.py forth/core.fs 
 
-This will copy the file `forth/core.fs` to memory starting at *byte* address
-0x3000 (which corresponds to actual memory address 0x1800), and passing it to
-the Forth interpreter. Log back in with `utils/terminal.sh` and verify that
-everything works:
+This will copy the file [core.fs](forth/core.fs) to memory starting at *byte*
+address 0x3000 (which corresponds to actual memory address 0x1800), and
+passing it to the Forth interpreter. Log back in with `utils/terminal.sh` and
+verify that everything works:
 
-    : blink  0 10 do  FF 0 p!  1F4 ms  0 0 p!  1F4 ms  loop ;
+    : blink  begin  key? 1B = if  exit  then  FF 0 p! 64 ms  0 0 p! 64 ms again ;
     blink
 
-Which should blink the on-board LED array 16 times. There is also an EEPROM
-library in `forth/eeprom.fs` which I use to interface a 25AA640 chip.
-This is an 8-pin SPI chip with 8 kB of EEPROM storage, 3.3V compatible.
-It should be hooked up as follows:
+Which should blink the on-board LED array until you press ESC.
+There is also an EEPROM library in `forth/eeprom.fs` which I use to interface
+a 25AA640 chip.  This is an 8-pin SPI chip with 8 kB of EEPROM storage, 3.3V
+compatible.  It should be hooked up as follows:
 
-    | 25AA640 pin | iCE40-HX8K header pin |
-    | ----------- | --------------------- |
-    | 1 (CS)      | C16                   |
-    | 2 (SO)      | K14                   |
-    | 5 (SI)      | E16                   |
-    | 6 (SCK)     | D16                   |
+| 25AA640 pin | iCE40-HX8K header pin |
+| ----------- | --------------------- |
+| 1 (CS)      | C16                   |
+| 2 (SO)      | K14                   |
+| 5 (SI)      | E16                   |
+| 6 (SCK)     | D16                   |
 
 Pins 3 (WP) and 7 (HOLD) are connected to Vpp through 10k resistors in order
 to deactivate these features.
@@ -101,28 +101,29 @@ addressing, respectively.
 
 Condition codes (marked `zzz` in the `CBRANCH` instruction) are as follows:
 
-    Code  |  Name     | Name
-    ----- | --------- | ----------
-    000   | ZERO      | EQ
-    001   | NONZERO   | NEQ
-    010   | NEGATIVE  | LT
-    011   | NONNEGATIVE | GE
-    100   | POSITIVE    | GT
-    101   | NONPOSITIVE | LE
-    --    | undefined   |
+Code  |  Name     | Name
+----- | --------- | ----------
+000   | ZERO      | EQ
+001   | NONZERO   | NEQ
+010   | NEGATIVE  | LT
+011   | NONNEGATIVE | GE
+100   | POSITIVE    | GT
+101   | NONPOSITIVE | LE
+110   | undefined   |
+111   | undefined   |
 
 ALU operations:
 
-    Code | Operation
-    ---- | ---------
-    0    |  NOP
-    1    |  ADD
-    2    |  SUB
-    3    |  AND
-    4    |  OR
-    5    |  XOR
-    6    |  SHIFT
-    7    |  MUL
+Code | Operation
+---- | ---------
+0    |  NOP
+1    |  ADD
+2    |  SUB
+3    |  AND
+4    |  OR
+5    |  XOR
+6    |  SHIFT
+7    |  MUL
 
 Note that shifts are arithmetical, and to the left when the second operand is
 positive, or to the right when it is negative.
