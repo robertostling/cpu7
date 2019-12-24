@@ -11,7 +11,7 @@ kernel.hex: asm/kernel.fs asm/assembler.fs
 	gforth asm/kernel.fs >kernel.hex
 
 upload: kernel.hex cpu7.bin
-	iceprog -S cpu7.bin && sleep 2
+	iceprog -S cpu7.bin && sleep 1
 	python3 utils/upload_hex.py kernel.hex
 
 clean:

@@ -407,11 +407,14 @@ header" move"
         r1 1 -x
     _again
 
+header" key?"
+:: *key?  port-serial-read _literal _p@ ;;
+
 header" key"
 :: *key
 :: serial-read-byte ( -- x )
     _begin
-        port-serial-read _literal _p@
+        *key?
     tos #negative _while
         _drop
     _repeat
