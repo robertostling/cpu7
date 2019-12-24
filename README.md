@@ -73,7 +73,7 @@ compatible.  It should be hooked up as follows:
 Pins 3 (WP) and 7 (HOLD) are connected to Vpp through 10k resistors in order
 to deactivate these features.
 
-## CPU instruction set
+## CPU
 
 There are 8 general-purpose registers, R0 to R7.
 R7 is hard-coded as return stack pointer, and R6 as the top element of the
@@ -81,6 +81,8 @@ return stack.
 
 The Forth system uses R5 as data stack pointer, and R4 to cache the top
 element of that stack.
+
+The instruction set is fairly minimal:
 
     000xxxxxxxxxxxxx    CALL x
     001xxxxxxxxxxxxx    BRANCH x
@@ -97,7 +99,10 @@ element of that stack.
 Where `aaa`, `bbb`, `ccc` stand for register indexes (0 to 7). `xxxx...` is a
 literal value, `r` is a return bit (1 = return after executing this
 instruction), and `d`/`i` are flags for pre-decrement and post-increment
-addressing, respectively.
+addressing, respectively. `ooo` is the ALU operation code.
+
+All instructions are single-cycle except those that read or write to memory
+(including a CALL or when the return bit is set), which take two cycles.
 
 Condition codes (marked `zzz` in the `CBRANCH` instruction) are as follows:
 
