@@ -19,6 +19,8 @@ set_io --warn-no-port GPOUT[4] G16
 set_io --warn-no-port GPOUT[5] H16
 set_io --warn-no-port GPOUT[6] J15
 set_io --warn-no-port GPOUT[7] G14
+
+# General outputs
 set_io --warn-no-port GPIN[0] K14
 set_io --warn-no-port GPIN[1] K15
 set_io --warn-no-port GPIN[2] M16
@@ -27,6 +29,11 @@ set_io --warn-no-port GPIN[4] P16
 set_io --warn-no-port GPIN[5] B16
 set_io --warn-no-port GPIN[6] D14
 set_io --warn-no-port GPIN[7] D15
+
+# Frequency synthesizer output
+
+set_io --warn-no-port SYNTH[0] E14
+set_io --warn-no-port SYNTH[1] F15
 
 # LEDs
 set_io --warn-no-port LED[0] B5  # D2

@@ -1,4 +1,5 @@
 `include "rs232.v"
+`include "synth.v"
 
 module main(
     //input wire resetq,
@@ -6,6 +7,7 @@ module main(
     input wire RS232_Rx,
     output wire RS232_Tx,
     output wire[7:0] LED,
+    output wire[1:0] SYNTH,
     output wire[7:0] GPOUT,
     input wire[7:0] GPIN
     );
@@ -13,6 +15,21 @@ module main(
     parameter ADR_SIZE = 13,
               WORD_SIZE = 16,
               INIT_IP = 13'h0000;
+
+    reg[63:0] cycles = 0;
+    always @(posedge sysclk)
+        cycles <= cycles + 1;
+
+
+    wire pllclk;
+    wire pll_locked;
+    pll myPLL (.clock_in(sysclk), .global_clock(pllclk), .locked(pll_locked));
+
+    reg[31:0] synth0scale;
+    reg[31:0] synth1scale;
+
+    synth synth0(.clk(pllclk), .outclk(SYNTH[0]), .scale(synth0scale));
+    synth synth1(.clk(pllclk), .outclk(SYNTH[1]), .scale(synth1scale));
 
     reg[19:0] init_count = 0;
     //wire clk = sysclk && (init_count == 20'hfffff);
@@ -201,6 +218,10 @@ mem[25 ] <= 16'b0010000000010010;
             3'h0: port_input = rs232_rxword;
             3'h1: port_input = rs232_readyword;
             3'h2: port_input = { 8'h0, GPIN[7:0] };
+            3'h4: port_input = cycles[63:48];
+            3'h5: port_input = cycles[47:32];
+            3'h6: port_input = cycles[31:16];
+            3'h7: port_input = cycles[15:0];
             default: port_input = 0;
         endcase
 
@@ -475,6 +496,14 @@ mem[25 ] <= 16'b0010000000010010;
                     if (write_port == 3'h2) gpout_buf <=
                         (gpout_buf & ~alu_arg1[15:8]) |
                         (alu_arg1[7:0] & alu_arg1[15:8]);
+                    if (write_port == 3'h4)
+                        synth0scale[31:16] <= alu_arg1[15:0];
+                    if (write_port == 3'h5)
+                        synth0scale[15:0] <= alu_arg1[15:0];
+                    if (write_port == 3'h6)
+                        synth1scale[31:16] <= alu_arg1[15:0];
+                    if (write_port == 3'h7)
+                        synth1scale[15:0] <= alu_arg1[15:0];
                 end
                 else if (op_portread) begin
                     if (ra_is_0) r0 <= port_input;
